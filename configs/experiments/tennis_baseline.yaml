@@ -14,7 +14,7 @@ model:
 training:
   batch_size: 8
   epochs: 50
-  learning_rate: 0.001
+  learning_rate: 0.0005  # 降低學習率
   num_workers: 4
-  freeze_backbone: false  # 從頭訓練，不凍結
+  freeze_backbone: true  # 凍結 Backbone，只訓練 LSTM
   pretrained_weights: null  # 沒有預訓練權重
