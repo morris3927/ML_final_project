@@ -78,7 +78,7 @@ data/raw/badminton/
 
 ```bash
 # 預覽 THETIS 資料結構（不實際複製）
-python3 scripts/organize_thetis.py \
+python scripts/organize_thetis.py \
     --thetis_dir ~/Downloads/thetis_rgb \
     --output_dir data/raw/tennis
 ```
@@ -155,7 +155,7 @@ data/raw/tennis/smash/: 20 videos
 ### 步驟 6: 運行預處理
 
 ```bash
-python3 src/data/preprocess_videos.py \
+python src/data/preprocess_videos.py \
     --raw_dir data/raw/tennis \
     --output_dir data/processed/tennis \
     --split_ratio 0.7 0.15 0.15

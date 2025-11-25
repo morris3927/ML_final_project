@@ -33,7 +33,7 @@ results/
 ### 基本訓練
 
 ```bash
-python3 src/train.py --config configs/experiments/tennis_baseline.yaml
+python src/train.py --config configs/experiments/tennis_baseline.yaml
 ```
 
 **自動產生**：
@@ -43,7 +43,7 @@ python3 src/train.py --config configs/experiments/tennis_baseline.yaml
 ### 自訂實驗名稱
 
 ```bash
-python3 src/train.py \
+python src/train.py \
     --config configs/experiments/tennis_baseline.yaml \
     --experiment_name "tennis_high_lr"
 ```
@@ -107,7 +107,7 @@ training:
 
 或命令行指定：
 ```bash
-python3 src/train.py \
+python src/train.py \
     --config configs/experiments/badminton_transfer.yaml \
     --pretrained_weights weights/experiments/tennis_7class_20251125_104530/best_model.pth
 ```
@@ -153,7 +153,7 @@ git commit -m "Add training results: tennis 7class baseline"
 
 ```bash
 # 1. 訓練
-python3 src/train.py --config configs/experiments/tennis_baseline.yaml
+python src/train.py --config configs/experiments/tennis_baseline.yaml
 
 # 結果自動保存到:
 # - weights/experiments/tennis_7class_20251125_104530/

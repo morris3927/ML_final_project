@@ -87,7 +87,7 @@ git pull origin main
 **預處理 (Preprocessing)**：
 執行 RGB frame 提取（簡化版，不計算光流）：
 ```bash
-python3 src/data/preprocess_videos.py \
+python src/data/preprocess_videos.py \
     --raw_dir data/raw/tennis \
     --output_dir data/processed/tennis \
     --split_ratio 0.7 0.15 0.15

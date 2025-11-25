@@ -146,7 +146,7 @@ done
 資料準備完成後，執行預處理：
 
 ```bash
-python3 src/data/preprocess_videos.py \
+python src/data/preprocess_videos.py \
     --raw_dir data/raw/tennis \
     --output_dir data/processed/tennis \
     --split_ratio 0.7 0.15 0.15 \

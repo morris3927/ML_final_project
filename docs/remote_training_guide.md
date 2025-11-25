@@ -36,7 +36,7 @@ ls -la
 
 ```bash
 # 創建虛擬環境
-python3 -m venv venv
+python -m venv venv
 
 # 啟動環境
 source venv/bin/activate
@@ -45,8 +45,8 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 # 驗證安裝
-python3 -c "import torch; print(f'PyTorch: {torch.__version__}')"
-python3 -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}')"
+python -c "import torch; print(f'PyTorch: {torch.__version__}')"
+python -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}')"
 ```
 
 ---
@@ -89,7 +89,7 @@ scp -r ~/Downloads/thetis_rgb/VIDEO_RGB \
 ls ~/Downloads/thetis_rgb/VIDEO_RGB/
 
 # 運行整理工具（查看指引）
-python3 scripts/organize_thetis.py \
+python scripts/organize_thetis.py \
     --thetis_dir ~/Downloads/thetis_rgb
 
 # 根據 THETIS 標註，手動整理影片到對應類別
@@ -128,7 +128,7 @@ smash: 25 videos
 source venv/bin/activate
 
 # 運行預處理（這會花一些時間）
-python3 src/data/preprocess_videos.py \
+python src/data/preprocess_videos.py \
     --raw_dir data/raw/tennis \
     --output_dir data/processed/tennis \
     --split_ratio 0.7 0.15 0.15
@@ -156,19 +156,19 @@ ls -lh data/processed/tennis/train/flat_service/
 
 ```bash
 # 先用測試配置確認流程正常（使用 GPU 1）
-CUDA_VISIBLE_DEVICES=1 python3 src/train.py --config configs/experiments/test_small.yaml
+CUDA_VISIBLE_DEVICES=1 python src/train.py --config configs/experiments/test_small.yaml
 ```
 
 #### 正式訓練（使用 GPU 1）
 
 ```bash
 # 網球 7 類訓練
-CUDA_VISIBLE_DEVICES=1 python3 src/train.py \
+CUDA_VISIBLE_DEVICES=1 python src/train.py \
     --config configs/experiments/tennis_baseline.yaml \
     --experiment_name "tennis_7class_baseline"
 
 # 使用 nohup 背景執行（推薦）⭐
-CUDA_VISIBLE_DEVICES=1 nohup python3 src/train.py \
+CUDA_VISIBLE_DEVICES=1 nohup python src/train.py \
     --config configs/experiments/tennis_baseline.yaml \
     --experiment_name "tennis_7class_baseline" \
     > training.log 2>&1 &
@@ -178,7 +178,7 @@ tail -f training.log
 
 # 或用 screen/tmux
 screen -S training
-CUDA_VISIBLE_DEVICES=1 python3 src/train.py --config configs/experiments/tennis_baseline.yaml
+CUDA_VISIBLE_DEVICES=1 python src/train.py --config configs/experiments/tennis_baseline.yaml
 # Ctrl+A, D 離開 screen
 # screen -r training  # 重新連接
 ```
@@ -258,10 +258,10 @@ nvidia-smi
 watch -n 1 nvidia-smi
 
 # 如果想改用 GPU 0
-CUDA_VISIBLE_DEVICES=0 python3 src/train.py --config ...
+CUDA_VISIBLE_DEVICES=0 python src/train.py --config ...
 
 # 如果想同時使用兩張 GPU
-CUDA_VISIBLE_DEVICES=0,1 python3 src/train.py --config ...
+CUDA_VISIBLE_DEVICES=0,1 python src/train.py --config ...
 ```
 
 ### 2. 調整 workers
@@ -307,7 +307,7 @@ model:
 
 ```bash
 # 確認是否使用 GPU
-python3 -c "import torch; print(f'Device: {torch.device(\"cuda\" if torch.cuda.is_available() else \"cpu\")}')"
+python -c "import torch; print(f'Device: {torch.device(\"cuda\" if torch.cuda.is_available() else \"cpu\")}')"
 
 # 減少 seq_length
 # 增加 num_workers
@@ -322,7 +322,7 @@ python3 -c "import torch; print(f'Device: {torch.device(\"cuda\" if torch.cuda.i
 git clone <repo-url> && cd 期末專案
 
 # 2. 環境
-python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt
+python -m venv venv && source venv/bin/activate && pip install -r requirements.txt
 
 # 3. 下載資料
 ./scripts/download_thetis.sh
@@ -331,10 +331,10 @@ python3 -m venv venv && source venv/bin/activate && pip install -r requirements.
 # 將影片整理到 data/raw/tennis/各類別/
 
 # 5. 預處理
-python3 src/data/preprocess_videos.py --raw_dir data/raw/tennis --output_dir data/processed/tennis
+python src/data/preprocess_videos.py --raw_dir data/raw/tennis --output_dir data/processed/tennis
 
 # 6. 訓練（使用 GPU 1，背景執行）
-CUDA_VISIBLE_DEVICES=1 nohup python3 src/train.py \
+CUDA_VISIBLE_DEVICES=1 nohup python src/train.py \
     --config configs/experiments/tennis_baseline.yaml \
     > training.log 2>&1 &
 
