@@ -1,6 +1,6 @@
 data:
   processed_path: "data/processed/tennis"
-  num_classes: 7  # flat_service, slice_service, smash, forehand_flat, backhand, forehand_volley, backhand_volley
+  num_classes: 12  # flat_service, slice_service, smash, forehand_flat, backhand, forehand_volley, backhand_volley
 
 model:
   backbone: "resnet50"

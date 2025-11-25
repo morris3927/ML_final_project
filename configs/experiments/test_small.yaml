@@ -1,6 +1,6 @@
 data:
   processed_path: "data/processed/tennis"
-  num_classes: 7
+  num_classes: 12
 
 model:
   backbone: "resnet50"
