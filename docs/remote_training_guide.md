@@ -155,20 +155,20 @@ ls -lh data/processed/tennis/train/flat_service/
 #### 測試訓練（小規模驗證）
 
 ```bash
-# 先用測試配置確認流程正常
-python3 src/train.py --config configs/experiments/test_small.yaml
+# 先用測試配置確認流程正常（使用 GPU 1）
+CUDA_VISIBLE_DEVICES=1 python3 src/train.py --config configs/experiments/test_small.yaml
 ```
 
-#### 正式訓練
+#### 正式訓練（使用 GPU 1）
 
 ```bash
 # 網球 7 類訓練
-python3 src/train.py \
+CUDA_VISIBLE_DEVICES=1 python3 src/train.py \
     --config configs/experiments/tennis_baseline.yaml \
     --experiment_name "tennis_7class_baseline"
 
-# 使用 nohup 背景執行（推薦）
-nohup python3 src/train.py \
+# 使用 nohup 背景執行（推薦）⭐
+CUDA_VISIBLE_DEVICES=1 nohup python3 src/train.py \
     --config configs/experiments/tennis_baseline.yaml \
     --experiment_name "tennis_7class_baseline" \
     > training.log 2>&1 &
@@ -178,7 +178,7 @@ tail -f training.log
 
 # 或用 screen/tmux
 screen -S training
-python3 src/train.py --config configs/experiments/tennis_baseline.yaml
+CUDA_VISIBLE_DEVICES=1 python3 src/train.py --config configs/experiments/tennis_baseline.yaml
 # Ctrl+A, D 離開 screen
 # screen -r training  # 重新連接
 ```
@@ -246,17 +246,22 @@ git push
 
 ## ⚡ 常見加速技巧
 
-### 1. 使用 GPU
+### 1. 使用 GPU 1（已預設）
+
+所有訓練命令已包含 `CUDA_VISIBLE_DEVICES=1`，會自動使用 GPU 1。
 
 ```bash
-# 確認 GPU 可用
-python3 -c "import torch; print(torch.cuda.is_available())"
-
-# 查看 GPU 狀態
+# 確認 GPU 1 可用
 nvidia-smi
 
-# 指定 GPU
+# 查看即時 GPU 使用狀況
+watch -n 1 nvidia-smi
+
+# 如果想改用 GPU 0
 CUDA_VISIBLE_DEVICES=0 python3 src/train.py --config ...
+
+# 如果想同時使用兩張 GPU
+CUDA_VISIBLE_DEVICES=0,1 python3 src/train.py --config ...
 ```
 
 ### 2. 調整 workers
@@ -310,7 +315,7 @@ python3 -c "import torch; print(f'Device: {torch.device(\"cuda\" if torch.cuda.i
 
 ---
 
-## 📝 完整命令摘要
+## 📝 完整命令摘要（使用 GPU 1）
 
 ```bash
 # 1. Clone
@@ -328,8 +333,10 @@ python3 -m venv venv && source venv/bin/activate && pip install -r requirements.
 # 5. 預處理
 python3 src/data/preprocess_videos.py --raw_dir data/raw/tennis --output_dir data/processed/tennis
 
-# 6. 訓練
-nohup python3 src/train.py --config configs/experiments/tennis_baseline.yaml > training.log 2>&1 &
+# 6. 訓練（使用 GPU 1，背景執行）
+CUDA_VISIBLE_DEVICES=1 nohup python3 src/train.py \
+    --config configs/experiments/tennis_baseline.yaml \
+    > training.log 2>&1 &
 
 # 7. 監控
 tail -f training.log
