@@ -21,11 +21,10 @@ weights/**/*.ckpt
 !weights/**/.gitkeep
 !weights/README.md
 
-# 訓練日誌
+# 訓練日誌和結果
 *.log
 training_*.log
-results/**/*.txt
-results/**/*.json
+results/
 !results/.gitkeep
 
 # Jupyter
