@@ -32,7 +32,9 @@ def evaluate(model_path, test_data_dir, config_path, output_dir="results"):
     test_dataset = VideoEventDataset(
         processed_dir=test_data_dir,
         seq_length=config['model'].get('seq_length', 16),
-        transform=None
+        transform=None,
+        use_event_labels=config['data'].get('use_event_labels', False),
+        sport=config['data'].get('sport', 'tennis')
     )
     
     num_classes = len(test_dataset.class_to_idx)

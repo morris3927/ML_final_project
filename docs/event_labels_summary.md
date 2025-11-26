@@ -2,17 +2,19 @@
 
 ## 概述
 
-本專案使用**雙層標籤系統**：
-1. **通用事件類別**（4 類）- 用於遷移學習
-2. **運動專屬動作**（網球 7 類，羽球 10+ 類）- 細分訓練
+本專案使用**事件分類系統**（基於 Wang et al. 2025）：
+- **4 個通用事件類別**：Smash, Net Play, Rally, Serve
+- **目的**：提升跨運動遷移學習效果
+- **優勢**：語意一致性、戰術意義
 
 ---
 
 ## ✅ 已完成的設定
 
 ### 1. 事件映射檔案
-- **位置**: `configs/event_mapping.json`
-- **內容**: 定義通用事件與各運動動作的對應關係
+- **位置**: `configs/event_mapping.yaml`
+- **內容**: 定義動作到事件的映射關係
+- **支援**: 網球和羽球兩種運動
 
 ### 2. 資料整理工具
 - **位置**: `scripts/organize_thetis.py`
@@ -63,23 +65,19 @@ python3 src/data/preprocess_videos.py \
 
 ## 🔄 遷移學習策略
 
-### 當前配置（推薦開始）
-- **網球**: 7 個細分類別訓練
-- **優點**: 保留最多資訊，可後續合併
-- **缺點**: 類別不平衡風險
+### 當前架構（事件分類）
+- **網球**: 4 類事件訓練 (Smash, Net Play, Rally, Serve)
+- **優點**: 
+  - 語意一致性高
+  - 簡化模型複雜度
+  - 更適合跨運動遷移
+- **排除**: 3 個動作 (backhand2hands, kick_service, slice_service)
 
 ### 未來遷移（網球 → 羽球）
-有兩種選擇：
-
-**選項 A: 細分到通用**
-1. 用 7 類訓練網球模型
-2. 遷移時合併為 4 類通用事件
-3. 在羽球上微調 4 類模型
-
-**選項 B: 通用到通用**
-1. 訓練時將網球 7 類合併為 4 類
-2. 直接遷移到羽球 4 類
-3. **實作更簡單！**
+1. 用 4 類事件訓練網球模型
+2. 使用網球模型作為預訓練權重
+3. 在羽球上微調 4 類事件模型
+4. 利用事件級別的語意相似性提升效果
 
 ---
 
@@ -87,7 +85,10 @@ python3 src/data/preprocess_videos.py \
 
 ```
 configs/
-└── event_mapping.json          # ✅ 事件映射定義
+├── event_mapping.yaml          # ✅ 事件映射定義 (YAML)
+└── experiments/
+    ├── tennis_baseline.yaml    # ✅ 主配置（4類事件）
+    └── tennis_colab.yaml       # ✅ Colab 配置
 
 scripts/
 ├── download_thetis.sh          # ✅ THETIS 下載
@@ -95,6 +96,7 @@ scripts/
 
 docs/
 ├── THETIS_processing.md        # ✅ 處理指南
+├── event_classification.md     # ✅ 事件分類說明
 └── dataset_preparation.md      # 資料準備總覽
 ```
 

@@ -1,0 +1,75 @@
+# 動作到事件的映射配置
+# 根據 Wang et al. (2025) 的事件分類架構
+
+# 事件定義
+events:
+  0:
+    name: "Smash"
+    description: "殺球/進攻事件 - 試圖終結回合或創造機會的高強度進攻"
+  1:
+    name: "Net Play"
+    description: "網前/小球事件 - 發生在網前區域的控制型擊球"
+  2:
+    name: "Rally"
+    description: "後場/對打事件 - 底線抽球、防守、過渡與調動"
+  3:
+    name: "Serve"
+    description: "發球事件 - 回合開始的靜態啟動動作"
+
+# 網球動作到事件的映射
+tennis_action_to_event:
+  # Event 0: Smash (殺球/進攻)
+  smash: 0
+  
+  # Event 1: Net Play (網前/小球)
+  backhand_volley: 1
+  forehand_volley: 1
+  
+  # Event 2: Rally (後場/對打)
+  forehand_flat: 2
+  forehand_openstands: 2
+  backhand: 2
+  forehand_slice: 2
+  backhand_slice: 2
+  
+  # Event 3: Serve (發球)
+  flat_service: 3
+  
+  # 以下動作將被排除（不使用）
+  # backhand2hands: null  # 不符合羽球動作特徵
+  # kick_service: null    # 複雜發球，不利遷移學習
+  # slice_service: null   # 複雜發球，不利遷移學習
+
+# 羽球動作到事件的映射（供未來使用）
+badminton_action_to_event:
+  # Event 0: Smash (殺球/進攻)
+  smash: 0
+  wrist_smash: 0
+  
+  # Event 1: Net Play (網前/小球)
+  net_shot: 1
+  return_net: 1
+  rush: 1
+  push: 1
+  cross_court_net_shot: 1
+  
+  # Event 2: Rally (後場/對打)
+  clear: 2
+  lob: 2
+  defensive_return_lob: 2
+  drive: 2
+  driven_flight: 2
+  back_court_drive: 2
+  defensive_return_drive: 2
+  drop: 2
+  passive_drop: 2
+  
+  # Event 3: Serve (發球)
+  short_service: 3
+  long_service: 3
+
+# 要排除的網球動作類別
+excluded_tennis_actions:
+  - backhand2hands
+  - kick_service
+  - slice_service

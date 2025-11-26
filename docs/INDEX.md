@@ -35,6 +35,12 @@
 - CSV 訓練記錄
 - 不覆蓋舊模型
 
+### 🎯 事件分類架構
+→ **[docs/event_classification.md](docs/event_classification.md)** - 事件分類說明（Wang et al. 2025）
+- 4 大戰術事件定義
+- 動作到事件的映射
+- 跨運動遷移學習架構
+
 ### 📖 專案說明
 → **[README.md](README.md)** - 專案總覽
 - 專案目標與架構
@@ -90,7 +96,9 @@
 ## 📂 配置文件
 
 ### 訓練配置
-- **`configs/experiments/tennis_baseline.yaml`** - 網球 RGB-only baseline
+- **`configs/experiments/tennis_baseline.yaml`** - 網球事件分類（4 類）
+- **`configs/experiments/tennis_colab.yaml`** - Colab 事件分類（4 類）
+- **`configs/event_mapping.yaml`** - 動作到事件的映射配置
 - **`configs/config.yaml`** - 全域配置（基礎範本）
 
 ---

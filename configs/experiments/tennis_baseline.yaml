@@ -1,6 +1,8 @@
 data:
   processed_path: "data/processed/tennis"
-  num_classes: 12  # flat_service, slice_service, smash, forehand_flat, backhand, forehand_volley, backhand_volley
+  num_classes: 4  # 事件分類：Smash, Net Play, Rally, Serve
+  use_event_labels: true  # 使用事件標籤而非動作標籤
+  sport: "tennis"
 
 model:
   backbone: "resnet50"
@@ -18,3 +20,5 @@ training:
   num_workers: 4
   freeze_backbone: true  # 凍結 Backbone，只訓練 LSTM
   pretrained_weights: null  # 沒有預訓練權重
+
+notes: "Event classification (4-class) based on Wang et al. (2025)"

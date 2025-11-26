@@ -14,10 +14,10 @@
 
 ```
 weights/experiments/
-├── tennis_7class_20251125_104530/
+├── tennis_4event_20251125_104530/
 │   ├── best_model.pth          # 最佳模型
 │   └── config.yaml             # 訓練配置
-├── tennis_7class_20251125_153000/
+├── tennis_4event_20251125_153000/
 │   └── ...
 └── badminton_transfer_20251126_090000/
     └── ...
@@ -37,7 +37,7 @@ python src/train.py --config configs/experiments/tennis_baseline.yaml
 ```
 
 **自動產生**：
-- 實驗目錄：`weights/experiments/tennis_7class_{timestamp}/`
+- 實驗目錄：`weights/experiments/tennis_4event_{timestamp}/`
 - CSV 記錄：自動添加一行
 
 ### 自訂實驗名稱
@@ -72,7 +72,7 @@ python src/train.py \
 **範例**：
 ```csv
 experiment_id,timestamp,config_file,dataset,num_classes,best_val_f1,model_path
-tennis_7class_20251125_104530,2025-11-25 10:45:30,tennis_baseline.yaml,tennis,7,0.8234,weights/experiments/tennis_7class_20251125_104530/best_model.pth
+tennis_4event_20251125_104530,2025-11-25 10:45:30,tennis_baseline.yaml,tennis,4,0.8234,weights/experiments/tennis_4event_20251125_104530/best_model.pth
 ```
 
 ---
@@ -109,7 +109,7 @@ training:
 ```bash
 python src/train.py \
     --config configs/experiments/badminton_transfer.yaml \
-    --pretrained_weights weights/experiments/tennis_7class_20251125_104530/best_model.pth
+    --pretrained_weights weights/experiments/tennis_4event_20251125_104530/best_model.pth
 ```
 
 ---
@@ -125,14 +125,14 @@ notes: "測試較高學習率 lr=0.01"
 ### 2. 定期備份實驗目錄
 ```bash
 # 重要實驗複製到 final/
-cp -r weights/experiments/tennis_7class_20251125_104530 weights/final/tennis_best
+cp -r weights/experiments/tennis_4event_20251125_104530 weights/final/tennis_best
 ```
 
 ### 3. Git 管理
 ```bash
 # CSV 記錄跟著版控
 git add results/training_history.csv
-git commit -m "Add training results: tennis 7class baseline"
+git commit -m "Add training results: tennis 4event baseline"
 
 # 模型權重不上傳（已在 .gitignore）
 ```
@@ -156,18 +156,18 @@ git commit -m "Add training results: tennis 7class baseline"
 python src/train.py --config configs/experiments/tennis_baseline.yaml
 
 # 結果自動保存到:
-# - weights/experiments/tennis_7class_20251125_104530/
+# - weights/experiments/tennis_4event_20251125_104530/
 # - results/training_history.csv (新增一行)
 
 # 2. 查看結果
 cat results/training_history.csv
 
 # 3. 如果是最佳模型
-cp -r weights/experiments/tennis_7class_20251125_104530 weights/final/tennis_final
+cp -r weights/experiments/tennis_4event_20251125_104530 weights/final/tennis_final
 
 # 4. 提交記錄
 git add results/training_history.csv
-git commit -m "Training: tennis 7class, F1=0.82"
+git commit -m "Training: tennis 4event, F1=0.82"
 ```
 
 ---

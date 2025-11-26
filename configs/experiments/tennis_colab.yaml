@@ -2,7 +2,9 @@ data:
   # 指向 Google Drive 上的資料路徑
   # 請確保在 Drive 上有這個資料夾: /content/drive/MyDrive/ML_data/tennis_processed
   processed_path: "/content/drive/MyDrive/ML_data/tennis_processed"
-  num_classes: 12
+  num_classes: 4  # 事件分類：Smash, Net Play, Rally, Serve
+  use_event_labels: true  # 使用事件標籤而非動作標籤
+  sport: "tennis"
 
 model:
   backbone: "resnet50"
@@ -14,11 +16,11 @@ model:
   use_pretrained: true  # Colab 網路快，直接下載
 
 training:
-  batch_size: 16  # Colab T4/P100 通常有 16GB VRAM，可以開大一點
+  batch_size: 16  # Colab T4/P100 通常有 16GB VRAM
   epochs: 50
   learning_rate: 0.0001  # 論文設定：Adam optimizer with lr=0.0001
   num_workers: 2  # Colab CPU 核心較少，設 2 比較保險
   freeze_backbone: true
   pretrained_weights: null
 
-notes: "Colab training configuration"
+notes: "Colab training - Event classification (4-class) based on Wang et al. (2025)"

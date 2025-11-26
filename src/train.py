@@ -118,7 +118,9 @@ def train(config, experiment_name=None):
         data_root=config['data']['processed_path'],
         batch_size=config['training']['batch_size'],
         seq_length=config['model'].get('seq_length', 16),
-        num_workers=config['training'].get('num_workers', 4)
+        num_workers=config['training'].get('num_workers', 4),
+        use_event_labels=config['data'].get('use_event_labels', False),
+        sport=config['data'].get('sport', 'tennis')
     )
     
     train_loader = dataloaders_dict.get('train')

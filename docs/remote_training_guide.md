@@ -162,15 +162,15 @@ CUDA_VISIBLE_DEVICES=1 python src/train.py --config configs/experiments/test_sma
 #### 正式訓練（使用 GPU 1）
 
 ```bash
-# 網球 7 類訓練
+# 網球事件分類訓練（4 類事件）
 CUDA_VISIBLE_DEVICES=1 python src/train.py \
     --config configs/experiments/tennis_baseline.yaml \
-    --experiment_name "tennis_7class_baseline"
+    --experiment_name "tennis_4event_baseline"
 
 # 使用 nohup 背景執行（推薦）⭐
 CUDA_VISIBLE_DEVICES=1 nohup python src/train.py \
     --config configs/experiments/tennis_baseline.yaml \
-    --experiment_name "tennis_7class_baseline" \
+    --experiment_name "tennis_4event_baseline" \
     > training.log 2>&1 &
 
 # 查看訓練進度
@@ -215,7 +215,7 @@ ls -lt weights/experiments/ | head -5
 
 ```bash
 # 查看最新實驗結果
-ls -lh weights/experiments/tennis_7class_*/
+ls -lh weights/experiments/tennis_4event_*/
 
 # 查看訓練記錄
 tail -1 results/training_history.csv
@@ -225,7 +225,7 @@ tail -1 results/training_history.csv
 
 ```bash
 # 在你的 Mac 上
-scp -r user@remote-server:~/projects/期末專案/weights/experiments/tennis_7class_20251125_* \
+scp -r user@remote-server:~/projects/期末專案/weights/experiments/tennis_4event_20251125_* \
     ./weights/experiments/
 
 # 下載訓練記錄
@@ -238,7 +238,7 @@ scp user@remote-server:~/projects/期末專案/results/training_history.csv \
 ```bash
 # 在遠端主機上
 git add results/training_history.csv
-git commit -m "Training: tennis 7class baseline, F1=0.XX"
+git commit -m "Training: tennis 4event baseline, F1=0.XX"
 git push
 ```
 
@@ -342,7 +342,7 @@ CUDA_VISIBLE_DEVICES=1 nohup python src/train.py \
 tail -f training.log
 
 # 8. 完成後下載結果（本地）
-scp -r user@server:~/projects/期末專案/weights/experiments/tennis_* ./weights/experiments/
+scp -r user@server:~/projects/期末專案/weights/experiments/tennis_4event_* ./weights/experiments/
 ```
 
 ---

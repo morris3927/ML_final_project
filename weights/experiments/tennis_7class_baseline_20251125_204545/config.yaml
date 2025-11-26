@@ -1,0 +1,19 @@
+_config_file: tennis_baseline.yaml
+data:
+  num_classes: 12
+  processed_path: data/processed/tennis
+model:
+  backbone: resnet50
+  dropout: 0.3
+  hidden_size: 512
+  num_lstm_layers: 3
+  seq_length: 16
+  use_optical_flow: false
+  use_pretrained: true
+training:
+  batch_size: 32
+  epochs: 50
+  freeze_backbone: true
+  learning_rate: 0.0001
+  num_workers: 4
+  pretrained_weights: null

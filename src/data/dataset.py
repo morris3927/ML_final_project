@@ -5,6 +5,7 @@ from PIL import Image
 import torchvision.transforms as transforms
 from pathlib import Path
 import numpy as np
+import yaml
 
 class VideoEventDataset(Dataset):
     """
@@ -12,17 +13,29 @@ class VideoEventDataset(Dataset):
     從預處理後的資料載入 frame 序列
     """
     
-    def __init__(self, processed_dir, seq_length=16, transform=None, stride=8):
+    def __init__(self, processed_dir, seq_length=16, transform=None, stride=8, 
+                 use_event_labels=False, event_mapping_path=None, sport='tennis'):
         """
         Args:
             processed_dir: 處理後的資料目錄，如 data/processed/tennis/train
             seq_length: 序列長度（幀數），預設 16
             transform: 資料增強轉換
             stride: sliding window 的步長，預設 8（50% overlap）
+            use_event_labels: 是否使用事件標籤（4類）而非動作標籤（12類）
+            event_mapping_path: 事件映射配置檔路徑
+            sport: 運動類型 ('tennis' 或 'badminton')
         """
         self.processed_dir = Path(processed_dir)
         self.seq_length = seq_length
         self.stride = stride
+        self.use_event_labels = use_event_labels
+        self.sport = sport
+        
+        # 載入事件映射
+        self.action_to_event = None
+        self.excluded_actions = []
+        if use_event_labels:
+            self._load_event_mapping(event_mapping_path)
         
         # 設定預設 transform
         if transform is None:
@@ -40,8 +53,32 @@ class VideoEventDataset(Dataset):
         self._scan_dataset()
         
         print(f"Dataset: {processed_dir}")
+        print(f"  Mode: {'Event' if use_event_labels else 'Action'} Classification")
         print(f"  Classes: {len(self.class_to_idx)} - {list(self.class_to_idx.keys())}")
         print(f"  Total samples: {len(self.samples)}")
+    
+    def _load_event_mapping(self, mapping_path):
+        """載入事件映射配置"""
+        if mapping_path is None:
+            mapping_path = Path(__file__).parent.parent.parent / "configs" / "event_mapping.yaml"
+        
+        mapping_path = Path(mapping_path)
+        if not mapping_path.exists():
+            raise FileNotFoundError(f"Event mapping file not found: {mapping_path}")
+        
+        with open(mapping_path, 'r') as f:
+            config = yaml.safe_load(f)
+        
+        # 根據運動類型選擇映射
+        mapping_key = f"{self.sport}_action_to_event"
+        if mapping_key not in config:
+            raise ValueError(f"Mapping for sport '{self.sport}' not found in config")
+        
+        self.action_to_event = config[mapping_key]
+        self.excluded_actions = config.get(f'excluded_{self.sport}_actions', [])
+        
+        print(f"Loaded event mapping for {self.sport}")
+        print(f"  Excluded actions: {self.excluded_actions}")
     
     def _scan_dataset(self):
         """
@@ -57,14 +94,41 @@ class VideoEventDataset(Dataset):
         if len(category_dirs) == 0:
             raise ValueError(f"No category directories found in {self.processed_dir}")
         
-        # 建立類別索引映射
-        for idx, cat_dir in enumerate(category_dirs):
-            self.class_to_idx[cat_dir.name] = idx
+        # 如果使用事件標籤，建立事件到索引的映射
+        if self.use_event_labels:
+            # 事件固定為 0-3
+            self.class_to_idx = {
+                'Smash': 0,
+                'Net Play': 1,
+                'Rally': 2,
+                'Serve': 3
+            }
+        else:
+            # 動作標籤：從資料夾名稱建立映射
+            for idx, cat_dir in enumerate(category_dirs):
+                action_name = cat_dir.name
+                # 跳過排除的動作
+                if action_name in self.excluded_actions:
+                    continue
+                self.class_to_idx[action_name] = idx
         
         # 掃描每個類別下的影片
         for cat_dir in category_dirs:
-            category_name = cat_dir.name
-            category_idx = self.class_to_idx[category_name]
+            action_name = cat_dir.name
+            
+            # 跳過排除的動作
+            if action_name in self.excluded_actions:
+                print(f"  Skipping excluded action: {action_name}")
+                continue
+            
+            # 確定標籤
+            if self.use_event_labels:
+                if action_name not in self.action_to_event:
+                    print(f"  Warning: Action '{action_name}' not in mapping, skipping...")
+                    continue
+                label = self.action_to_event[action_name]
+            else:
+                label = self.class_to_idx[action_name]
             
             # 掃描該類別下的所有影片資料夾
             video_dirs = sorted([d for d in cat_dir.iterdir() if d.is_dir()])
@@ -83,8 +147,8 @@ class VideoEventDataset(Dataset):
                     end_idx = start_idx + self.seq_length
                     sample = {
                         'frames': frame_files[start_idx:end_idx],
-                        'label': category_idx,
-                        'category': category_name,
+                        'label': label,
+                        'action': action_name,
                         'video_name': video_dir.name
                     }
                     self.samples.append(sample)
@@ -98,7 +162,7 @@ class VideoEventDataset(Dataset):
         
         Returns:
             frames: Tensor of shape (seq_length, 3, H, W)
-            label: int
+            label: int (event label if use_event_labels=True, else action label)
         """
         sample = self.samples[idx]
         frame_paths = sample['frames']
@@ -128,7 +192,8 @@ class BadmintonDataset(VideoEventDataset):
     pass
 
 
-def get_dataloaders(data_root, batch_size=8, seq_length=16, num_workers=4):
+def get_dataloaders(data_root, batch_size=8, seq_length=16, num_workers=4, 
+                    use_event_labels=False, event_mapping_path=None, sport='tennis'):
     """
     便捷函數：建立 train/val/test dataloaders
     
@@ -137,9 +202,13 @@ def get_dataloaders(data_root, batch_size=8, seq_length=16, num_workers=4):
         batch_size: batch 大小
         seq_length: 序列長度
         num_workers: DataLoader 的工作執行緒數
+        use_event_labels: 是否使用事件標籤（4類）
+        event_mapping_path: 事件映射配置檔路徑
+        sport: 運動類型 ('tennis' 或 'badminton')
     
     Returns:
-        dict: {'train': train_loader, 'val': val_loader, 'test': test_loader, 'num_classes': int}
+        dict: {'train': train_loader, 'val': val_loader, 'test': test_loader, 
+               'num_classes': int, 'class_to_idx': dict}
     """
     data_root = Path(data_root)
     
@@ -161,6 +230,7 @@ def get_dataloaders(data_root, batch_size=8, seq_length=16, num_workers=4):
     # 建立 datasets
     dataloaders = {}
     num_classes = None
+    class_to_idx = None
     
     for split in ['train', 'val', 'test']:
         split_dir = data_root / split
@@ -175,11 +245,15 @@ def get_dataloaders(data_root, batch_size=8, seq_length=16, num_workers=4):
             processed_dir=split_dir,
             seq_length=seq_length,
             transform=transform,
-            stride=8 if split == 'train' else seq_length  # test/val 不重疊
+            stride=8 if split == 'train' else seq_length,  # test/val 不重疊
+            use_event_labels=use_event_labels,
+            event_mapping_path=event_mapping_path,
+            sport=sport
         )
         
         if num_classes is None:
             num_classes = len(dataset.class_to_idx)
+            class_to_idx = dataset.class_to_idx
         
         dataloaders[split] = torch.utils.data.DataLoader(
             dataset,
@@ -190,6 +264,6 @@ def get_dataloaders(data_root, batch_size=8, seq_length=16, num_workers=4):
         )
     
     dataloaders['num_classes'] = num_classes
-    dataloaders['class_to_idx'] = dataset.class_to_idx if dataset else {}
+    dataloaders['class_to_idx'] = class_to_idx
     
     return dataloaders
