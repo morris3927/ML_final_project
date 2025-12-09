@@ -14,6 +14,7 @@ model:
   use_pretrained: true
 
 training:
+  use_class_weights: true  # 🔑 使用類別權重解決類別不平衡
   batch_size: 16
   epochs: 50
   learning_rate: 0.0001  # 🔑 降低學習率 (從 0.001 到 0.0001)

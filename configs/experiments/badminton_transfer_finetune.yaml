@@ -16,9 +16,10 @@ model:
 training:
   batch_size: 16  # 羽球資料可能較少，使用較小 batch size
   epochs: 50  # 微調全模型需要更多 epochs
-  learning_rate: 0.00001  # 🔑 非常小的學習率，避免破壞預訓練權重
+  learning_rate: 0.00005  # 🔑 調高學習率以加速收斂
   num_workers: 4
   freeze_backbone: false  # 🔑 不凍結，允許微調整個模型
   pretrained_weights: "weights/experiments/tennis_4event_baseline_20251126_072103/best_model.pth"  # 🔑 網球模型權重
+  use_class_weights: true  # 🔑 使用類別權重解決類別不平衡
 
-notes: "Transfer learning from tennis (4-class events) - Strategy B: Full model fine-tuning"
+notes: "Transfer learning from tennis (4-class events) - Strategy B: Full model fine-tuning + Class Weights"
