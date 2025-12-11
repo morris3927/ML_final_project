@@ -12,6 +12,7 @@ from pathlib import Path
 from datetime import datetime
 import csv
 import json
+from collections import Counter
 
 # 添加專案根目錄到 Python 路徑
 project_root = Path(__file__).parent.parent
@@ -192,8 +193,34 @@ def train(config, experiment_name=None):
         model = nn.DataParallel(model)
         print(f"GPU IDs: {list(range(torch.cuda.device_count()))}")
 
-    # 4. 定義 Loss 與 Optimizer
-    criterion = nn.CrossEntropyLoss()
+    # 4. 定義 Loss 與 Optimizer (支援 class weights)
+    class_weights = None
+    if config['training'].get('use_class_weights', False):
+        print("\n計算類別權重 (Class Weights) 以處理類別不平衡...")
+        # 從 DataLoader 統計各類別樣本數
+        all_labels = []
+        for batch in train_loader:
+            _, labels = batch
+            all_labels.extend(labels.numpy())
+        
+        label_counts = Counter(all_labels)
+        total_samples = len(all_labels)
+        n_classes = len(label_counts)
+        
+        # 計算 balanced weights: n_samples / (n_classes * n_samples_per_class)
+        weights = []
+        for i in range(n_classes):
+            count = label_counts.get(i, 1)  # 避免除以零
+            weight = total_samples / (n_classes * count)
+            weights.append(weight)
+        
+        class_weights = torch.tensor(weights, dtype=torch.float32).to(device)
+        
+        print(f"  類別分佈: {dict(sorted(label_counts.items()))}")
+        print(f"  類別權重: {[f'{w:.3f}' for w in weights]}")
+        print(f"  (較少的類別會有較大的權重)\n")
+    
+    criterion = nn.CrossEntropyLoss(weight=class_weights)
     optimizer = optim.Adam(
         filter(lambda p: p.requires_grad, model.parameters()), # 只更新需要梯度的參數
         lr=float(config['training']['learning_rate'])
